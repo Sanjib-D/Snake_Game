@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Snake Revolution</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  </head>
+  <body data-theme="light">
+    <header>
+      <div class="header-content">
+        <h1 class="logo" onclick="goToHome()" title="Return to Home">
+          SNAKE REVOLUTION
+        </h1>
+        <button id="theme-toggle-btn" onclick="toggleTheme()">
+          <i class="fas fa-moon"></i> Dark Mode
+        </button>
+      </div>
+    </header>
+    <main>
+      <section id="landing-page" class="active-section">
+        <div class="hero">
+          <h2>The Ultimate Snake Experience</h2>
+          <p>Master 12 Arcade Modes</p>
+          <div class="hero-buttons">
+            <button
+              id="play-now-btn"
+              class="pulsate"
+              onclick="showModeSelection()"
+            >
+              PLAY NOW
+            </button>
+
+            <div class="secondary-links">
+              <button onclick="openCreditsModal()">
+                <i class="fas fa-star"></i> Credits
+              </button>
+              <button
+                onclick="window.open('https://sanjib-d.github.io/Portfolio/contact.html', '_blank')"
+              >
+                <i class="fas fa-envelope"></i> Contact
+              </button>
+              <button
+                class="portfolio-btn"
+                onclick="window.open('https://sanjib-d.github.io/Portfolio/', '_blank')"
+              >
+                <i class="fas fa-briefcase"></i> Developer Portfolio
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="mode-selection" class="hidden-section">
+        <button class="back-btn" onclick="goToHome()">← Back to Home</button>
+        <div class="mode-layout">
+          <div class="high-score-panel">
+            <h3>🏆 Top 10 Leaders</h3>
+            <div class="score-list-container short-list">
+              <ul id="top-10-list">
+                <li>Loading...</li>
+              </ul>
+            </div>
+            <button id="view-all-btn" onclick="openLeaderboardModal()">
+              View Top 100
+            </button>
+          </div>
+          <div class="modes-container">
+            <div class="arcade-grid">
+              <div
+                class="mode-card mode-classic"
+                onclick="startGame('classic')"
+              >
+                <div class="card-content">
+                  <h4>1. Classic Mode</h4>
+                  <p>Endless. Speed increases.</p>
+                </div>
+              </div>
+              <div
+                class="mode-card mode-time"
+                onclick="startGame('time_attack')"
+              >
+                <div class="card-content">
+                  <h4>2. Time Attack</h4>
+                  <p>60s Limit. Walls Wrap.</p>
+                </div>
+              </div>
+              <div
+                class="mode-card mode-obstacle"
+                onclick="startGame('obstacle')"
+              >
+                <div class="card-content">
+                  <h4>3. Obstacle</h4>
+                  <p>Avoid static & moving blocks.</p>
+                </div>
+              </div>
+              <div
+                class="mode-card mode-speed"
+                onclick="startGame('speed_rush')"
+              >
+                <div class="card-content">
+                  <h4>4. Speed Rush</h4>
+                  <p>Gets faster every 3 foods.</p>
+                </div>
+              </div>
+              <div class="mode-card mode-maze" onclick="startGame('maze')">
+                <div class="card-content">
+                  <h4>5. Maze</h4>
+                  <p>Predefined path.</p>
+                </div>
+              </div>
+              <div class="mode-card mode-boss" onclick="startGame('boss_food')">
+                <div class="card-content">
+                  <h4>6. Boss Food</h4>
+                  <p>Giant food requires 5 hits.</p>
+                </div>
+              </div>
+              <div
+                class="mode-card mode-survival"
+                onclick="startGame('survival')"
+              >
+                <div class="card-content">
+                  <h4>7. Survival</h4>
+                  <p>Health Bar. Walls hurt.</p>
+                </div>
+              </div>
+              <div class="mode-card mode-dark" onclick="startGame('dark_mode')">
+                <div class="card-content">
+                  <h4>8. Dark Mode</h4>
+                  <p>Flashlight visibility only.</p>
+                </div>
+              </div>
+              <div class="mode-card mode-poison" onclick="startGame('poison')">
+                <div class="card-content">
+                  <h4>9. Poison</h4>
+                  <p>Avoid the purple food.</p>
+                </div>
+              </div>
+              <div
+                class="mode-card mode-reverse"
+                onclick="startGame('reverse')"
+              >
+                <div class="card-content">
+                  <h4>10. Reverse</h4>
+                  <p>Controls swap randomly!</p>
+                </div>
+              </div>
+              <div class="mode-card mode-portal" onclick="startGame('portal')">
+                <div class="card-content">
+                  <h4>11. Portal</h4>
+                  <p>Enter Blue -> Exit Orange.</p>
+                </div>
+              </div>
+              <div
+                class="mode-card mode-multi"
+                onclick="startGame('multi_food')"
+              >
+                <div class="card-content">
+                  <h4>12. Multi-Food</h4>
+                  <p>Eat quickly before they vanish.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="game-area" class="hidden-section">
+        <div id="game-wrapper">
+          <div class="game-header">
+            <button class="exit-btn" onclick="goToHome()">EXIT GAME</button>
+            <div id="score-board">
+              <span>Score: <b id="score">0</b></span>
+              <span>Mode: <b id="current-mode-display">Classic</b></span>
+            </div>
+          </div>
+
+          <div
+            id="health-bar-container"
+            style="
+              display: none;
+              width: 100%;
+              max-width: 600px;
+              background: #ddd;
+              height: 20px;
+              border-radius: 10px;
+              margin-bottom: 10px;
+              border: 2px solid #333;
+              overflow: hidden;
+            "
+          >
+            <div
+              id="health-fill"
+              style="
+                width: 100%;
+                height: 100%;
+                background: #e74c3c;
+                transition: width 0.2s;
+              "
+            ></div>
+          </div>
+
+          <div id="canvas-container">
+            <canvas id="gameCanvas" width="600" height="600"></canvas>
+            <div
+              id="reverse-alert"
+              style="
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: #e74c3c;
+                color: white;
+                padding: 5px 10px;
+                border-radius: 5px;
+                font-weight: bold;
+                display: none;
+              "
+            >
+              REVERSED!
+            </div>
+
+            <div id="start-screen" class="overlay">
+              <h2 id="mode-title">CLASSIC MODE</h2>
+              <p>Use Arrow Keys to Start</p>
+              <p class="instruction" id="mode-instruction"></p>
+            </div>
+            <div id="game-over-screen" class="overlay hidden">
+              <h2>GAME OVER</h2>
+              <p>Final Score: <span id="final-score">0</span></p>
+              <div id="save-score-container">
+                <input
+                  type="text"
+                  id="player-name"
+                  placeholder="Enter Name (Max 10 chars)"
+                  maxlength="10"
+                />
+                <button id="save-btn" onclick="saveScore()">Save Score</button>
+              </div>
+              <p id="save-message" class="hidden"></p>
+              <div class="go-buttons">
+                <button onclick="resetGame()">Try Again</button>
+                <button onclick="showModeSelection()">Change Mode</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div id="leaderboard-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2>🏆 Hall of Fame (Top 100)</h2>
+            <button class="close-modal-btn" onclick="closeLeaderboardModal()">
+              ✖
+            </button>
+          </div>
+          <div class="full-score-list-wrapper">
+            <ul id="top-100-list">
+              <li>Loading...</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div id="credits-modal" class="modal-overlay hidden">
+        <div class="modal-content credits-content">
+          <div class="modal-header">
+            <h2>✨ Credits & Tech</h2>
+            <button class="close-modal-btn" onclick="closeCreditsModal()">
+              ✖
+            </button>
+          </div>
+          <div class="credits-body">
+            <div class="credit-item">
+              <strong>Lead Developer</strong>
+              <p>Sanjib Das</p>
+            </div>
+            <div class="credit-item">
+              <strong>AI Assistant</strong>
+              <p>Gemini AI</p>
+            </div>
+            <div class="credit-item">
+              <strong>Infrastructure</strong>
+              <p>GitHub Hosting & Firebase Database</p>
+            </div>
+            <hr />
+            <p style="margin-top: 15px; font-style: italic; font-size: 0.9rem">
+              "Snake Revolution" is a showcase of modern web game development.
+            </p>
+            <button class="close-btn-action" onclick="closeCreditsModal()">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p>
+        &copy; 2025 Snake Revolution. Developed by
+        <a href="https://sanjib-d.github.io/Portfolio/" target="_blank"
+          >Sanjib</a
+        >
+      </p>
+    </footer>
+
+    <script src="firebase-utils.js"></script>
+    <script src="ui.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>
